@@ -1,36 +1,53 @@
-#define GLFW_INCLUDE_VULKAN
-#define GLFW_INCLUDE_VULKAN
+#define GLFW_INCLUDE_VULKAN //GFLW + Vulkan 헤더 로드
 #include <GLFW/glfw3.h>
 
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/vec4.hpp>
-#include <glm/mat4x4.hpp>
-
 #include <iostream>
+#include <stdexcept>
+#include <cstdlib>
 
-int main() {
-    glfwInit();
+const uint32_t WIDTH = 800;
+const uint32_t HEIGHT = 600;
 
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Vulkan window", nullptr, nullptr);
-
-    uint32_t extensionCount = 0;
-    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-
-    std::cout << extensionCount << " extensions supported" << std::endl;
-
-    glm::mat4 matrix;
-    glm::vec4 vec;
-    auto test = matrix * vec;
-
-    while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
+class HelloTriangleApplication {
+public:
+    void run() {
+        initVulkan();
+        mainLoop();
+        cleanup();
     }
 
-    glfwDestroyWindow(window);
+private:
+    void initVulkan() {
+        glfwInit(); //GLFW 초기화
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); //GLFW 라이브러리 초기화
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); //GFLW 창 크기 조정
+        window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr); //실제 창 생성
+    }
 
-    glfwTerminate();
+    void mainLoop() {
+        while (!glfwWindowShouldClose(window))
+            glfwPollEvents();
+    }
 
-    return 0;
+    void cleanup() {
+        glfwDestroyWindow(window);
+        glfwTerminate();
+    }
+    
+private:
+    GLFWwindow* window;
+};
+
+int main() {
+    HelloTriangleApplication app;
+    
+    try {
+        app.run();
+    }
+    catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }
